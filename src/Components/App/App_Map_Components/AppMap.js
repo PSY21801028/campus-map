@@ -6,11 +6,14 @@ import AppSplash from "../App_Splash_Components/AppSplash";
 import { theme } from "../../../Style/theme";
 import axios from "axios";
 import FindRoute from "../../../Assets/img/FindRoute.png";
+import CameraIcon from "../../../Assets/img/CameraIcon.png"; // 카메라 아이콘 이미지 추가
 import NavigationDrawer from "../../../Assets/img/NavigationDrawer.png";
 import { useTranslation } from "react-i18next";
 import i18n from "./../../../locales/i18n";
+import YOLO_Modal from "./YOLO_Modal"; // Import the renamed modal component
 
 const AppMap = () => {
+
   const NAVER_API_KEY = process.env.REACT_APP_NAVER_MAP_API_KEY;
   const NAVER_ID = process.env.REACT_APP_NAVER_ID;
   const navermaps = window.naver.maps;
@@ -73,6 +76,16 @@ const AppMap = () => {
     setSliderVisible(false);
     setIsSliderVisible(false);
   };
+
+  const [show, setShow] = useState(false);
+
+  const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
+
+  const handleCameraClick = () => {
+    setShow(true);
+  };
+
   // 현재 위치 받아오기
   const handleCurrentLocation = useCallback(() => {
     if (navigator.geolocation) {
@@ -82,11 +95,6 @@ const AppMap = () => {
             position.coords.latitude,
             position.coords.longitude
           );
-          // const positionData = {
-          //   key: 3745,
-          //   position: new navermaps.LatLng(37.5432527996, 127.0566145649),
-          //   title: "성수동 카페거리",
-          // };
           setCurrentPosition(newPosition);
           setNewPosition(newPosition);
           console.log("My current location: ", newPosition);
@@ -157,6 +165,7 @@ const AppMap = () => {
       alert("검색 중 오류가 발생했습니다.");
     }
   };
+
   return (
     <ThemeProvider theme={theme}>
       {loading ? (
@@ -171,7 +180,6 @@ const AppMap = () => {
             backgroundColor: "#fff",
             alignItems: "center",
           }}
-          //onInitialized={(map) => setNaverMap(map)}
           onClick={handleMapClick}
         >
           <BackgroundBlur isOpen={isNavOpen} onClick={toggleNav} />
@@ -187,6 +195,7 @@ const AppMap = () => {
               <MenuButton onClick={toggleNav} />
             </InputGroup>
             <FindRouteButton />
+            <CameraButton onClick={handleCameraClick} /> {/* 카메라 버튼 추가 */}
             {isNavOpen && <Navigation />}
           </SearchContainer>
           <ChipContainer visible={isContainersVisible}>
@@ -233,11 +242,13 @@ const AppMap = () => {
               </SliderContent>
             </Slider>
           )}
+          <YOLO_Modal show={show} handleClose={handleClose} />
         </MapDiv>
       )}
     </ThemeProvider>
   );
 };
+
 export default AppMap;
 
 const Slider = ({
@@ -315,6 +326,16 @@ const FindRouteButton = styled.button`
   height: 48px;
   background: none;
   background-image: url(${FindRoute});
+  background-size: cover;
+  border: none;
+  padding: 0;
+  margin-left: 5px;
+`;
+const CameraButton  = styled.button`
+  width: 48px;
+  height: 48px;
+  background: none;
+  background-image: url(${CameraIcon});
   background-size: cover;
   border: none;
   padding: 0;
